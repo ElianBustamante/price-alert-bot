@@ -68,11 +68,11 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
     shopping_results = results.get("shopping_results", [])
     
     top_results = []
-    for item in shopping_results[:5]:
+    for item in shopping_results[:20]:
         title = item.get("title", "")
         price_raw = item.get("price", "")
         store = item.get("source", "")
-        link = item.get("link", "")
+        link = item.get("product_link") or item.get("link", "")
         
         price_value = parse_price(price_raw)
         currency = detect_currency(price_raw, price_value)

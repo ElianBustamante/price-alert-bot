@@ -26,7 +26,7 @@ def test_get_prices_success(mocker):
             {"title": "SSD 3", "price": "$74.990", "source": "Falabella", "link": "http://fala"},
             {"title": "SSD 4", "price": "USD 80", "source": "Ebay", "link": "http://ebay"},
             {"title": "SSD 5", "price": "85.000", "source": "Paris", "link": "http://paris"},
-            {"title": "SSD 6", "price": "$90.99", "source": "BestBuy", "link": "http://bb"} # 6th item should be ignored
+            {"title": "SSD 6", "price": "$90.99", "source": "BestBuy", "link": "http://bb"} # 6th item should now be included
         ]
     }
     
@@ -34,7 +34,7 @@ def test_get_prices_success(mocker):
     
     results = get_prices("Samsung SSD 990 PRO 1TB Heatsink")
     
-    assert len(results) == 5
+    assert len(results) == 6
     
     assert results[0]["title"] == "SSD 1"
     assert results[0]["price_raw"] == "$79.99"
@@ -54,6 +54,9 @@ def test_get_prices_success(mocker):
 
     assert results[4]["price_value"] == 85000.0
     assert results[4]["currency"] == "CLP"
+
+    assert results[5]["price_value"] == 90.99
+    assert results[5]["currency"] == "USD"
 
 def test_get_prices_missing_key(mocker):
     mocker.patch("os.getenv", return_value=None)

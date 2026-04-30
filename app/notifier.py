@@ -34,15 +34,21 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
     ]
     
     for alert in alerts:
-        store = alert.get("store", "Desconocido")
+        store_raw = alert.get("store", "Desconocido")
+        # Remove domains like .cl or .com so WhatsApp doesn't make it a blue link
+        store = store_raw.split('.')[0].capitalize()
+        
         price_usd = alert.get("price_usd", 0.0)
         price_clp = alert.get("price_clp", 0)
+        # Format USD price with comma instead of dot
+        price_usd_str = f"{price_usd:.2f}".replace(".", ",")
+        
         trigger = alert.get("triggered_by", "UNKNOWN")
         link = alert.get("link", "#")
         
         message_lines.append(f"🛒 *{store}*")
-        message_lines.append(f"💵 USD: ${price_usd}")
-        message_lines.append(f"🇨🇱 CLP: ${price_clp}")
+        message_lines.append(f"💵 USD: {price_usd_str}")
+        message_lines.append(f"🇨🇱 CLP: {price_clp}")
         message_lines.append(f"🎯 Disparador: {trigger}")
         message_lines.append(f"🔗 {link}")
         message_lines.append("")

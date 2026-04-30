@@ -30,6 +30,7 @@ jobs:
         
     - name: Run Price Checker
       env:
+        TZ: "America/Santiago"
         SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
         CALLMEBOT_KEY: ${{ secrets.CALLMEBOT_KEY }}
