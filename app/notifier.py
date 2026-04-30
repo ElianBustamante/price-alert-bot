@@ -29,7 +29,7 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
     
     # Dividir las alertas en grupos de 4 para no exceder el límite de texto de CallMeBot
     import time
-    alerts_chunks = [alerts[i:i + 4] for i in range(0, len(alerts), 4)]
+    alerts_chunks = [alerts[i:i + 1] for i in range(0, len(alerts), 1)]
     all_success = True
     
     for index, chunk in enumerate(alerts_chunks):
