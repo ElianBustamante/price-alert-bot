@@ -34,7 +34,7 @@ def test_get_prices_success(mocker):
     
     results = get_prices("Samsung SSD 990 PRO 1TB Heatsink")
     
-    assert len(results) == 6
+    assert len(results) == 10
     
     assert results[0]["title"] == "SSD 1"
     assert results[0]["price_raw"] == "$79.99"
@@ -54,9 +54,10 @@ def test_get_prices_success(mocker):
 
     assert results[4]["price_value"] == 85000.0
     assert results[4]["currency"] == "CLP"
-
-    assert results[5]["price_value"] == 90.99
-    assert results[5]["currency"] == "USD"
+    
+    # Second batch (US results) should be identical to first batch due to our mock
+    assert results[5]["title"] == "SSD 1"
+    assert results[5]["price_value"] == 79.99
 
 def test_get_prices_missing_key(mocker):
     mocker.patch("os.getenv", return_value=None)

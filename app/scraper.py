@@ -48,42 +48,48 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
     if not serpapi_key:
         raise ValueError("SERPAPI_KEY is missing from environment variables.")
         
-    params = {
-        "engine": "google_shopping",
-        "q": product_query,
-        "gl": "cl",
-        "hl": "es",
-        "api_key": serpapi_key
-    }
-    
-    try:
-        search = GoogleSearch(params)
-        results = search.get_dict()
-    except Exception as e:
-        raise RuntimeError(f"SerpAPI call failed: {e}")
-        
-    if "error" in results:
-        raise RuntimeError(f"SerpAPI returned an error: {results['error']}")
-        
-    shopping_results = results.get("shopping_results", [])
+    params_cl = {"engine": "google_shopping", "q": product_query, "gl": "cl", "hl": "es", "api_key": serpapi_key}
+    params_us = {"engine": "google_shopping", "q": product_query, "gl": "us", "hl": "es", "api_key": serpapi_key}
     
     top_results = []
-    for item in shopping_results[:10]:
-        title = item.get("title", "")
-        price_raw = item.get("price", "")
-        store = item.get("source", "")
-        link = item.get("product_link") or item.get("link", "")
+    has_error = False
+    last_error = ""
+    
+    for params in [params_cl, params_us]:
+        try:
+            search = GoogleSearch(params)
+            results = search.get_dict()
+        except Exception as e:
+            has_error = True
+            last_error = str(e)
+            continue
+            
+        if "error" in results:
+            has_error = True
+            last_error = results["error"]
+            continue
+            
+        shopping_results = results.get("shopping_results", [])
         
-        price_value = parse_price(price_raw)
-        currency = detect_currency(price_raw, price_value)
-        
-        top_results.append({
-            "title": title,
-            "price_raw": price_raw,
-            "price_value": price_value,
-            "currency": currency,
-            "store": store,
-            "link": link
-        })
+        for item in shopping_results[:5]:
+            title = item.get("title", "")
+            price_raw = item.get("price", "")
+            store = item.get("source", "")
+            link = item.get("product_link") or item.get("link", "")
+            
+            price_value = parse_price(price_raw)
+            currency = detect_currency(price_raw, price_value)
+            
+            top_results.append({
+                "title": title,
+                "price_raw": price_raw,
+                "price_value": price_value,
+                "currency": currency,
+                "store": store,
+                "link": link
+            })
+            
+    if not top_results and has_error:
+        raise RuntimeError(f"SerpAPI call failed: {last_error}")
         
     return top_results
