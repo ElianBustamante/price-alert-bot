@@ -27,52 +27,62 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
 
     header = "🧪 *[TEST] Alerta de precio!*" if is_test else "🚨 *Alerta de precio!*"
     
-    message_lines = [
-        header,
-        f"*{product_name}*",
-        ""
-    ]
+    # Dividir las alertas en grupos de 4 para no exceder el límite de texto de CallMeBot
+    import time
+    alerts_chunks = [alerts[i:i + 4] for i in range(0, len(alerts), 4)]
+    all_success = True
     
-    for alert in alerts:
-        store_raw = alert.get("store", "Desconocido")
-        # Remove domains like .cl or .com so WhatsApp doesn't make it a blue link
-        store = store_raw.split('.')[0].capitalize()
-        
-        price_usd = alert.get("price_usd", 0.0)
-        price_clp = alert.get("price_clp", 0)
-        # Format USD price with comma instead of dot
-        price_usd_str = f"{price_usd:.2f}".replace(".", ",")
-        
-        trigger = alert.get("triggered_by", "UNKNOWN")
-        link = alert.get("link", "#")
-        
-        message_lines.append(f"🛒 *{store}*")
-        message_lines.append(f"💵 USD: {price_usd_str}")
-        message_lines.append(f"🇨🇱 CLP: {price_clp}")
-        message_lines.append(f"🎯 Disparador: {trigger}")
-        message_lines.append(f"🔗 {link}")
+    for index, chunk in enumerate(alerts_chunks):
+        message_lines = [header]
+        if index == 0:
+            message_lines.append(f"*{product_name}*")
+            message_lines.append(f"Mostrando {len(alerts)} resultados...")
+        else:
+            message_lines.append(f"*(Continuación {index+1}/{len(alerts_chunks)})*")
         message_lines.append("")
         
-    timestamp = datetime.now().strftime("%d/%m/%Y a las %H:%M")
-    message_lines.append(f"⏰ Revisado el {timestamp}")
-    
-    # The requests library automatically URL-encodes the params dict
-    text_to_send = "\n".join(message_lines)
-    
-    params = {
-        "phone": phone,
-        "text": text_to_send,
-        "apikey": apikey
-    }
-    
-    try:
-        response = requests.get("https://api.callmebot.com/whatsapp.php", params=params, timeout=10)
-        if response.status_code == 200:
-            logger.info("WhatsApp message sent successfully.")
-            return True
-        else:
-            logger.error(f"Failed to send WhatsApp message. Status code: {response.status_code}, Response: {response.text}")
-            return False
-    except Exception as e:
-        logger.error(f"Exception while sending WhatsApp message: {e}")
-        return False
+        for alert in chunk:
+            store_raw = alert.get("store", "Desconocido")
+            store = store_raw.split('.')[0].capitalize()
+            
+            price_usd = alert.get("price_usd", 0.0)
+            price_clp = alert.get("price_clp", 0)
+            price_usd_str = f"{price_usd:.2f}".replace(".", ",")
+            
+            trigger = alert.get("triggered_by", "UNKNOWN")
+            # Reemplazar espacios por %20 para que WhatsApp no corte el enlace
+            link = alert.get("link", "#").replace(" ", "%20")
+            
+            message_lines.append(f"🛒 *{store}*")
+            message_lines.append(f"💵 USD: {price_usd_str}")
+            message_lines.append(f"🇨🇱 CLP: {price_clp}")
+            message_lines.append(f"🎯 Disparador: {trigger}")
+            message_lines.append(f"🔗 {link}")
+            message_lines.append("")
+            
+        if index == len(alerts_chunks) - 1:
+            timestamp = datetime.now().strftime("%d/%m/%Y a las %H:%M")
+            message_lines.append(f"⏰ Revisado el {timestamp}")
+        
+        text_to_send = "\n".join(message_lines)
+        params = {
+            "phone": phone,
+            "text": text_to_send,
+            "apikey": apikey
+        }
+        
+        try:
+            response = requests.get("https://api.callmebot.com/whatsapp.php", params=params, timeout=10)
+            if response.status_code == 200:
+                logger.info(f"WhatsApp message chunk {index+1} sent successfully.")
+            else:
+                logger.error(f"Failed to send chunk {index+1}. Status code: {response.status_code}")
+                all_success = False
+        except Exception as e:
+            logger.error(f"Exception while sending chunk {index+1}: {e}")
+            all_success = False
+            
+        if len(alerts_chunks) > 1 and index < len(alerts_chunks) - 1:
+            time.sleep(2) # Esperar 2 segundos entre mensajes para evitar bloqueo por spam
+            
+    return all_success

@@ -32,7 +32,7 @@ def test_send_whatsapp_success(mock_env, mocker):
     assert "🚨 *Alerta de precio!*" in text
     assert "*Samsung SSD*" in text
     assert "Amazon" in text
-    assert "74.99" in text
+    assert "74,99" in text
     assert "71240" in text
     assert "USD" in text
     assert "http://amazon" in text

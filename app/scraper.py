@@ -68,7 +68,7 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
     shopping_results = results.get("shopping_results", [])
     
     top_results = []
-    for item in shopping_results[:20]:
+    for item in shopping_results[:10]:
         title = item.get("title", "")
         price_raw = item.get("price", "")
         store = item.get("source", "")
