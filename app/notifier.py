@@ -83,6 +83,6 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
             all_success = False
             
         if len(alerts_chunks) > 1 and index < len(alerts_chunks) - 1:
-            time.sleep(2) # Esperar 2 segundos entre mensajes para evitar bloqueo por spam
+            time.sleep(12) # Esperar 12 segundos entre mensajes para evitar bloqueo estricto por spam de CallMeBot
             
     return all_success
