@@ -63,6 +63,16 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
         if index == len(alerts_chunks) - 1:
             timestamp = datetime.now().strftime("%d/%m/%Y a las %H:%M")
             message_lines.append(f"⏰ Revisado el {timestamp}")
+            
+            unique_htmls = []
+            for c in alerts_chunks:
+                for a in c:
+                    html = a.get("source_html")
+                    if html and html not in unique_htmls:
+                        unique_htmls.append(html)
+                        
+            for i, html in enumerate(unique_htmls):
+                message_lines.append(f"📄 Respaldo HTML {i+1}: {html}")
         
         text_to_send = "\n".join(message_lines)
         params = {

@@ -86,7 +86,8 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
                 "price_value": price_value,
                 "currency": currency,
                 "store": store,
-                "link": link
+                "link": link,
+                "source_html": results.get("search_metadata", {}).get("raw_html_file", "")
             })
             
     if not top_results and has_error:
