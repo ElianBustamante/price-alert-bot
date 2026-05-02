@@ -55,6 +55,9 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
     has_error = False
     last_error = ""
     
+    # Extract exclusion words from the query (words starting with '-')
+    exclusion_words = [word[1:].lower() for word in product_query.split() if word.startswith('-')]
+    
     for params in [params_cl, params_us]:
         try:
             search = GoogleSearch(params)
@@ -77,6 +80,12 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
         seen_stores = set()
         unique_items = []
         for item in shopping_results:
+            title_lower = item.get("title", "").lower()
+            
+            # Strict Python-side exclusion filter
+            if exclusion_words and any(ex_word in title_lower for ex_word in exclusion_words):
+                continue
+                
             store = item.get("source", "").lower().strip()
             # Only add to unique_items if we haven't seen this store before
             if store not in seen_stores:
