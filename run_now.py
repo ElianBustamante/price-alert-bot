@@ -27,15 +27,12 @@ def price_check_job():
         alerts = check_prices(prices)
         logger.info(f"{len(alerts)} results triggered a price alert.")
         
-        # Step 3: Send notifications if any alerts exist
-        if alerts:
-            success = send_whatsapp(alerts, product_name=product_query, is_test=False)
-            if success:
-                logger.info("WhatsApp message sent successfully.")
-            else:
-                logger.error("Failed to send WhatsApp message.")
+        # Step 3: Send notifications regardless of whether alerts exist
+        success = send_whatsapp(alerts, product_name=product_query, is_test=False)
+        if success:
+            logger.info("WhatsApp message sent successfully.")
         else:
-            logger.info("No alerts triggered. No WhatsApp message sent.")
+            logger.error("Failed to send WhatsApp message.")
             
     except Exception as e:
         logger.error(f"An error occurred during the price check job: {e}", exc_info=True)

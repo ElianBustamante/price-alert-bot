@@ -71,7 +71,21 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
             
         shopping_results = results.get("shopping_results", [])
         
-        for item in shopping_results[:5]:
+        is_cl = params.get("gl") == "cl"
+        limit = 3 if is_cl else 7
+        
+        seen_stores = set()
+        unique_items = []
+        for item in shopping_results:
+            store = item.get("source", "").lower().strip()
+            # Only add to unique_items if we haven't seen this store before
+            if store not in seen_stores:
+                seen_stores.add(store)
+                unique_items.append(item)
+            if len(unique_items) >= limit:
+                break
+                
+        for item in unique_items:
             title = item.get("title", "")
             price_raw = item.get("price", "")
             store = item.get("source", "")
@@ -87,7 +101,8 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
                 "currency": currency,
                 "store": store,
                 "link": link,
-                "source_html": results.get("search_metadata", {}).get("raw_html_file", "")
+                "source_html": results.get("search_metadata", {}).get("raw_html_file", ""),
+                "region": "CL" if is_cl else "US"
             })
             
     if not top_results and has_error:

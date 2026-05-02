@@ -15,9 +15,7 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
     Sends a formatted WhatsApp message via CallMeBot API.
     Returns True if the message was sent successfully, False otherwise.
     """
-    if not alerts:
-        return False
-        
+
     phone = os.getenv("PHONE_NUMBER")
     apikey = os.getenv("CALLMEBOT_KEY")
     
@@ -27,6 +25,39 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
 
     header = "🧪 *[TEST] Alerta de precio!*" if is_test else "🚨 *Alerta de precio!*"
     
+    has_cl = any(a.get("region") == "CL" for a in alerts)
+    has_us = any(a.get("region") == "US" for a in alerts)
+    
+    missing_texts = []
+    if not has_cl:
+        missing_texts.append("⚠️ No se encontraron ofertas nacionales bajo el límite.")
+    if not has_us:
+        missing_texts.append("⚠️ No se encontraron ofertas internacionales bajo el límite.")
+        
+    if not alerts:
+        timestamp = datetime.now().strftime("%d/%m/%Y a las %H:%M")
+        message_lines = [
+            header,
+            f"*{product_name}*",
+            "",
+            *missing_texts,
+            "",
+            f"⏰ Revisado el {timestamp}"
+        ]
+        text_to_send = "\n".join(message_lines)
+        params = {"phone": phone, "text": text_to_send, "apikey": apikey}
+        try:
+            response = requests.get("https://api.callmebot.com/whatsapp.php", params=params, timeout=10)
+            if response.status_code == 200:
+                logger.info("Empty alerts WhatsApp message sent successfully.")
+                return True
+            else:
+                logger.error(f"Failed to send empty message. Status code: {response.status_code}")
+                return False
+        except Exception as e:
+            logger.error(f"Exception while sending empty WhatsApp message: {e}")
+            return False
+            
     # Dividir las alertas en grupos de 4 para no exceder el límite de texto de CallMeBot
     import time
     alerts_chunks = [alerts[i:i + 1] for i in range(0, len(alerts), 1)]
@@ -37,6 +68,9 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
         if index == 0:
             message_lines.append(f"*{product_name}*")
             message_lines.append(f"Mostrando {len(alerts)} resultados...")
+            if missing_texts:
+                message_lines.append("")
+                message_lines.extend(missing_texts)
         else:
             message_lines.append(f"*(Continuación {index+1}/{len(alerts_chunks)})*")
         message_lines.append("")

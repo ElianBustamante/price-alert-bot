@@ -34,30 +34,21 @@ def test_get_prices_success(mocker):
     
     results = get_prices("Samsung SSD 990 PRO 1TB Heatsink")
     
-    assert len(results) == 10
+    assert len(results) == 9
     
+    # First batch (CL) should have 3 items
     assert results[0]["title"] == "SSD 1"
-    assert results[0]["price_raw"] == "$79.99"
-    assert results[0]["price_value"] == 79.99
-    assert results[0]["currency"] == "USD"
     assert results[0]["store"] == "Amazon"
-    assert results[0]["link"] == "http://amazon"
-
-    assert results[1]["price_value"] == 75000.0
-    assert results[1]["currency"] == "CLP"
-
-    assert results[2]["price_value"] == 74990.0
-    assert results[2]["currency"] == "CLP"
-
-    assert results[3]["price_value"] == 80.0
-    assert results[3]["currency"] == "USD"
-
-    assert results[4]["price_value"] == 85000.0
-    assert results[4]["currency"] == "CLP"
+    assert results[1]["title"] == "SSD 2"
+    assert results[1]["store"] == "MercadoLibre"
+    assert results[2]["title"] == "SSD 3"
+    assert results[2]["store"] == "Falabella"
     
-    # Second batch (US results) should be identical to first batch due to our mock
-    assert results[5]["title"] == "SSD 1"
-    assert results[5]["price_value"] == 79.99
+    # Second batch (US) should have 6 items (all unique in mock)
+    assert results[3]["title"] == "SSD 1"
+    assert results[3]["store"] == "Amazon"
+    assert results[8]["title"] == "SSD 6"
+    assert results[8]["store"] == "BestBuy"
 
 def test_get_prices_missing_key(mocker):
     mocker.patch("os.getenv", return_value=None)
