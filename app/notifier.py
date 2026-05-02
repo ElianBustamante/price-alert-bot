@@ -58,7 +58,7 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
             logger.error(f"Exception while sending empty WhatsApp message: {e}")
             return False
             
-    # Dividir las alertas en grupos de 4 para no exceder el límite de texto de CallMeBot
+    # Split alerts into groups of 1 to avoid exceeding CallMeBot's text limit
     import time
     alerts_chunks = [alerts[i:i + 1] for i in range(0, len(alerts), 1)]
     all_success = True
@@ -84,7 +84,7 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
             price_usd_str = f"{price_usd:.2f}".replace(".", ",")
             
             trigger = alert.get("triggered_by", "UNKNOWN")
-            # Reemplazar espacios por %20 para que WhatsApp no corte el enlace
+            # Replace spaces with %20 so WhatsApp doesn't break the link
             link = alert.get("link", "#").replace(" ", "%20")
             
             message_lines.append(f"🛒 *{store}*")
@@ -127,6 +127,6 @@ def send_whatsapp(alerts: list[dict], product_name: str, is_test: bool = False) 
             all_success = False
             
         if len(alerts_chunks) > 1 and index < len(alerts_chunks) - 1:
-            time.sleep(12) # Esperar 12 segundos entre mensajes para evitar bloqueo estricto por spam de CallMeBot
+            time.sleep(12) # Wait 12 seconds between messages to prevent strict spam blocking by CallMeBot
             
     return all_success
