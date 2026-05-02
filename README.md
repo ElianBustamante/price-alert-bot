@@ -3,6 +3,7 @@
 A Python-based automated bot that monitors any product's prices on Google Shopping using SerpAPI. It continuously scrapes both local and international stores, automatically converts currencies to evaluate your predefined price limits, and sends real-time WhatsApp alerts via CallMeBot if a product falls below your desired price threshold.
 
 ## Features
+
 - **Dual-Region Search**: Simultaneously scrapes your local country's Google Shopping and the United States to ensure you get both local retail options and international deals (like Amazon or eBay).
 - **Smart Store Deduplication**: Automatically filters out duplicate listings from the same store, ensuring you get a clean list of top unique retailers.
 - **WhatsApp Pagination**: Bypasses CallMeBot character limits by sending 1 product per message with built-in rate-limiting delays to avoid spam blocks.
@@ -10,6 +11,7 @@ A Python-based automated bot that monitors any product's prices on Google Shoppi
 - **Serverless Architecture**: Runs entirely on GitHub Actions via Cron jobs. No servers, Heroku, or Railway deployment needed!
 
 ## Requirements
+
 - Python 3.11+
 - [SerpAPI](https://serpapi.com/) account (Free tier is sufficient)
 - [CallMeBot](https://www.callmebot.com/) activation for WhatsApp
@@ -17,12 +19,14 @@ A Python-based automated bot that monitors any product's prices on Google Shoppi
 ## Setup Steps
 
 1. **Clone the repo**
+
    ```bash
    git clone https://github.com/ElianBustamante/price-alert-bot.git
    cd price-alert-bot
    ```
 
 2. **Install dependencies**
+
    ```bash
    python -m venv venv
    # On Windows:
@@ -45,14 +49,17 @@ A Python-based automated bot that monitors any product's prices on Google Shoppi
 
 5. **Test the Bot Locally**
    Ensure your `.env` is configured correctly, then run:
+
    ```bash
    python run_now.py
    ```
+
    You should receive your live price alerts directly on your WhatsApp.
 
 ## GitHub Actions Deployment
 
 This bot is configured to run completely free on GitHub Actions.
+
 1. Fork or push this repository to your own GitHub account.
 2. Go to your repository **Settings** > **Secrets and variables** > **Actions**.
 3. Add all the variables from your `.env` file as **Repository Secrets**.
