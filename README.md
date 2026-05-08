@@ -1,4 +1,4 @@
-# Smart Price Alert Bot
+# Price Alert Bot
 
 A Python-based automated bot that monitors any product's prices on Google Shopping using SerpAPI. It continuously scrapes both local and international stores, automatically converts currencies to evaluate your predefined price limits, and sends real-time WhatsApp alerts via CallMeBot if a product falls below your desired price threshold.
 
@@ -6,9 +6,18 @@ A Python-based automated bot that monitors any product's prices on Google Shoppi
 
 - **Dual-Region Search**: Simultaneously scrapes your local country's Google Shopping and the United States to ensure you get both local retail options and international deals (like Amazon or eBay).
 - **Smart Store Deduplication**: Automatically filters out duplicate listings from the same store, ensuring you get a clean list of top unique retailers.
+- **Strict Exclusion Filters**: Use negative keywords (e.g., `-EVO` or `-Aliexpress`) in your query to automatically ban specific product models or block unwanted stores natively in Python.
 - **WhatsApp Pagination**: Bypasses CallMeBot character limits by sending 1 product per message with built-in rate-limiting delays to avoid spam blocks.
 - **Empty State Notifications**: Proactively notifies you via WhatsApp even if no products were found under the price limit, including backup SerpAPI HTML links to manually verify the Google Shopping results.
 - **Serverless Architecture**: Runs entirely on GitHub Actions via Cron jobs. No servers, Heroku, or Railway deployment needed!
+
+## Tech Stack
+
+- **Language**: Python 3.11+
+- **APIs**: SerpAPI (Google Shopping scraper) & CallMeBot API (WhatsApp gateway)
+- **Infrastructure**: GitHub Actions (Serverless CI/CD & Cron Job Scheduler)
+- **Testing**: `pytest` and `pytest-mock` (Unit testing and API mocking)
+- **Core Libraries**: `requests` (HTTP client) & `python-dotenv` (Environment management)
 
 ## Requirements
 

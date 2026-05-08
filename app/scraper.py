@@ -81,15 +81,16 @@ def get_prices(product_query: str) -> List[Dict[str, Any]]:
         unique_items = []
         for item in shopping_results:
             title_lower = item.get("title", "").lower()
+            store_lower = item.get("source", "").lower().strip()
             
-            # Strict Python-side exclusion filter
-            if exclusion_words and any(ex_word in title_lower for ex_word in exclusion_words):
+            # Strict Python-side exclusion filter (checks both title and store name)
+            if exclusion_words and any(ex_word in title_lower or ex_word in store_lower for ex_word in exclusion_words):
                 continue
                 
-            store = item.get("source", "").lower().strip()
+            store = item.get("source", "").strip()
             # Only add to unique_items if we haven't seen this store before
-            if store not in seen_stores:
-                seen_stores.add(store)
+            if store_lower not in seen_stores:
+                seen_stores.add(store_lower)
                 unique_items.append(item)
             if len(unique_items) >= limit:
                 break

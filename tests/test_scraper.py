@@ -64,3 +64,33 @@ def test_get_prices_api_error(mocker):
     
     with pytest.raises(RuntimeError, match="SerpAPI call failed"):
         get_prices("SSD")
+
+def test_get_prices_with_exclusions(mocker):
+    mock_search = mocker.patch("app.scraper.GoogleSearch")
+    mock_instance = mock_search.return_value
+    mock_instance.get_dict.return_value = {
+        "shopping_results": [
+            {"title": "Samsung SSD 1", "price": "$79.99", "source": "Amazon", "link": "http://a"},
+            {"title": "Samsung EVO", "price": "$70.00", "source": "Amazon", "link": "http://b"}, # Excluded by title
+            {"title": "Samsung SSD 2", "price": "$75.00", "source": "Aliexpress", "link": "http://c"}, # Excluded by store
+            {"title": "Samsung SSD 3", "price": "$80.00", "source": "BestBuy", "link": "http://d"}
+        ]
+    }
+    
+    mocker.patch("os.getenv", return_value="fake_api_key")
+    
+    results = get_prices("Samsung SSD -EVO -aliexpress")
+    
+    # Since it runs twice (CL and US) and limits are 3 and 7, 
+    # the mock returns the same list twice.
+    # Excluded items are dropped, leaving 2 valid items per region.
+    # Total expected: 4 items (2 for CL, 2 for US).
+    assert len(results) == 4
+    
+    # Check CL results
+    assert results[0]["title"] == "Samsung SSD 1"
+    assert results[1]["title"] == "Samsung SSD 3"
+    
+    # Check US results
+    assert results[2]["title"] == "Samsung SSD 1"
+    assert results[3]["title"] == "Samsung SSD 3"
