@@ -1,69 +1,54 @@
 # Price Alert Bot
 
-A Python-based automated bot that monitors any product's prices on Google Shopping using SerpAPI. It continuously scrapes both local and international stores, automatically converts currencies to evaluate your predefined price limits, and sends real-time WhatsApp alerts via CallMeBot if a product falls below your desired price threshold.
+A Python script that monitors Google Shopping prices and sends real-time WhatsApp alerts via CallMeBot. It automatically handles currency conversions and compares prices against your custom limits.
 
-## Features
+---
 
-- **Dual-Region Search**: Simultaneously scrapes your local country's Google Shopping and the United States to ensure you get both local retail options and international deals (like Amazon or eBay).
-- **Smart Store Deduplication**: Automatically filters out duplicate listings from the same store, ensuring you get a clean list of top unique retailers.
-- **Strict Exclusion Filters**: Use negative keywords (e.g., `-EVO` or `-Aliexpress`) in your query to automatically ban specific product models or block unwanted stores natively in Python.
-- **WhatsApp Pagination**: Bypasses CallMeBot character limits by sending 1 product per message with built-in rate-limiting delays to avoid spam blocks.
-- **Empty State Notifications**: Proactively notifies you via WhatsApp even if no products were found under the price limit, including backup SerpAPI HTML links to manually verify the Google Shopping results.
-- **Serverless Architecture**: Runs entirely on GitHub Actions via Cron jobs. No servers, Heroku, or Railway deployment needed!
+## Key Features
+
+- **Dual-Region Search**: Scrapes Google Shopping in both your local country and the US simultaneously.
+- **Smart Deduplication**: Automatically filters out duplicate products from the same store.
+- **Strict Exclusion Filters**: Use negative keywords (like `-EVO` or `-Aliexpress`) to ban specific models or block unwanted sellers.
+- **WhatsApp Alerts**: Sends deals directly to your phone, automatically bypassing CallMeBot's character limits.
+- **Always-On Reporting**: Messages you even if no deals are found, including a backup link to verify the results.
+- **Serverless**: Runs entirely on GitHub Actions for free. No Heroku or 24/7 servers needed.
+
+---
 
 ## Tech Stack
 
-- **Language**: Python 3.11+
-- **APIs**: SerpAPI (Google Shopping scraper) & CallMeBot API (WhatsApp gateway)
-- **Infrastructure**: GitHub Actions (Serverless CI/CD & Cron Job Scheduler)
-- **Testing**: `pytest` and `pytest-mock` (Unit testing and API mocking)
-- **Core Libraries**: `requests` (HTTP client) & `python-dotenv` (Environment management)
+- **Python 3.11+**
+- **SerpAPI** (Google Shopping scraper) & **CallMeBot API** (WhatsApp gateway)
+- **GitHub Actions** (Serverless CI/CD & Cron Job Scheduler)
+- **pytest** & **pytest-mock** (Unit testing and API mocking)
+- **requests** (HTTP client) & **python-dotenv** (Environment management)
 
-## Requirements
+---
 
-- Python 3.11+
+## Setup & Installation
+
+### 1. Requirements
+
 - [SerpAPI](https://serpapi.com/) account (Free tier is sufficient)
-- [CallMeBot](https://www.callmebot.com/) activation for WhatsApp
+- [CallMeBot](https://www.callmebot.com/) activation for WhatsApp (Send `I allow callmebot to send me messages` to `+1 (206) 337-5567` on WhatsApp)
 
-## Setup Steps
+### 2. Running Locally
 
-1. **Clone the repo**
+```bash
+git clone https://github.com/ElianBustamante/price-alert-bot.git
+cd price-alert-bot
+python -m venv venv
 
-   ```bash
-   git clone https://github.com/ElianBustamante/price-alert-bot.git
-   cd price-alert-bot
-   ```
+# Activate virtual environment
+source venv/bin/activate  # Linux/macOS
+.\venv\Scripts\activate   # Windows
 
-2. **Install dependencies**
+pip install -r requirements.txt
+cp .env.example .env       # Fill in your variables
+python run_now.py
+```
 
-   ```bash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On Mac/Linux:
-   # source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-3. **Configure Environment Variables**
-   Copy `.env.example` to `.env` and fill in all variables:
-   - `SERPAPI_KEY`: Your SerpAPI key
-   - `PHONE_NUMBER`: Your WhatsApp number (e.g., +56912345678)
-   - `CALLMEBOT_KEY`: Your CallMeBot API key
-   - `PRODUCT_QUERY`: The exact product you want to search for (e.g., "Sony WH-1000XM5 -refurbished")
-   - `PRICE_LIMIT_USD` and `PRICE_LIMIT_CLP`: Your desired price limits.
-
-4. **How to activate CallMeBot**
-   To get your API key, send the activation message (e.g., `I allow callmebot to send me messages`) to `+1 (206) 337-5567` on WhatsApp. They will reply with your API Key.
-
-5. **Test the Bot Locally**
-   Ensure your `.env` is configured correctly, then run:
-
-   ```bash
-   python run_now.py
-   ```
-
-   You should receive your live price alerts directly on your WhatsApp.
+---
 
 ## GitHub Actions Deployment
 
